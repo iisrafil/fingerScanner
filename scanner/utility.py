@@ -56,7 +56,3 @@ def scanner(suspect):
 
     return str(filename)
 
-
-
-
-
