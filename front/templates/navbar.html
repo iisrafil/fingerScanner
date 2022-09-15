@@ -1,1 +1,11 @@
-<h1>NAV</h1>
+<nav>
+    <div>
+        <a href="{% url 'home' %}"><span>{{nav.0}}</span></a>
+        {% for page in nav|slice:"1:" %}
+        <a href="{% url page %}"><span>{{page}}</span></a>
+        {% endfor %}
+    </div>
+    <div>
+        <a href="front/login">login</a>
+    </div>
+</nav>

@@ -21,6 +21,6 @@ from api.views import home
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name="home"),
-    path('front', include("front.urls"), name="front"),
+    path('front/', include("front.urls"), name="front"),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
