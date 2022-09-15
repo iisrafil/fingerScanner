@@ -4,6 +4,7 @@ import cv2
 from random import shuffle;
 from base64 import b64encode;
 import matplotlib.pyplot as plt;
+import requests;
 
 from fingerScanner.settings import BASE_DIR
 
@@ -62,3 +63,7 @@ def get_chart(data):
     plt.tight_layout();
     chart = get_graph();
     return chart;
+
+def getUsers():
+    url = "https://reqres.in/api/users?page=2";
+    return requests.get(url).json();

@@ -2,4 +2,20 @@
 
 {% block content %}
     <h1>Own</h1>
+    {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
+    <table>
+        <tr>
+            {% for colTitle in users.0 %}
+            <th>{{colTitle}}</th>
+            {% endfor %}
+        </tr>
+        {% for user in users|slice:"1:" %}
+        <tr>
+            {% for val in user|slice:":-1" %}
+            <th>{{val}}</th>
+            {% endfor %}
+            <th><img src="{{user|last}}" alt="{{user|last}}"></th>
+        </tr>
+        {% endfor %}
+    </table>
 {% endblock content %}

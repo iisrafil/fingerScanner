@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from front.utils import getUsers;
 
 # Create your views here.
 
@@ -17,8 +18,13 @@ def about(req):
     return render(req, "about.html", context);
 
 def owners(req):
+    data = getUsers()["data"];
+    # data = [{"a": 1}];
+    users = [list(data[0].keys())];
+    users += [list(user.values()) for user in data];
     context = {
         "nav": nav,
+        "users": users,
     }
     return render(req, "owners.html", context);
 
