@@ -4,6 +4,8 @@ import cv2
 from random import shuffle;
 from base64 import b64encode;
 import matplotlib.pyplot as plt;
+import numpy as np;
+import perfplot as p;
 import requests;
 
 from fingerScanner.settings import BASE_DIR
@@ -57,9 +59,11 @@ def get_graph():
     buffer.close();
     return graph;
 
-def get_chart(data):
+
+def get_chart():
     plt.switch_backend("AGG");
-    plt.imshow(data, origin="lower");
+    # plt.imshow(data, origin="lower");
+    # p.show(setup=np.random.rand, kernels=[np.sum,sum], n_range=[2**k for k in range(10)]);
     plt.tight_layout();
     chart = get_graph();
     return chart;

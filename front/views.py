@@ -8,6 +8,7 @@ from django.contrib import messages;
 # from django.contrib.auth.mixins import LoginRequiredMixin;
 from .forms import CreateUserForm;
 from .decorators import authenticated_already, allowed_users;
+from .utils import get_chart;
 
 # Create your views here.
 
@@ -16,6 +17,7 @@ nav = ["home", "about", "owners", "vehicles"];
 def front(req):
     context = {
         "nav": nav,
+        "img": get_chart(),
     }
     return render(req, "home.html", context);
 

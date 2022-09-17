@@ -4,5 +4,6 @@
 
 {% block content %}
     <h1>Hello, {% if user.is_authenticated %}{{user}}{% else %}Guest{% endif %}</h1>
-    User groups: {{user.groups.all}}
+    <p>User groups: {{user.groups.all}}</p>
+    <img src="data:img/png;base64, {{img|safe}}" alt="perfplot">
 {% endblock content %}
