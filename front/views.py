@@ -1,9 +1,13 @@
 from django.shortcuts import render, redirect;
 from front.utils import getUsers;
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm;
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm;
 from django.contrib.auth.decorators import login_required;
+from django.contrib.auth.models import Group;
+from django.contrib import messages;
 # from django.contrib.auth.mixins import LoginRequiredMixin;
+from .forms import CreateUserForm;
+from .decorators import authenticated_already, allowed_users;
 
 # Create your views here.
 
@@ -21,7 +25,8 @@ def about(req):
     }
     return render(req, "about.html", context);
 
-@login_required
+@login_required(login_url="login")
+@allowed_users(["admin", "law"])
 def owners(req):
     data = getUsers()["data"];
     # data = [{"a": 1}];
@@ -40,8 +45,8 @@ def vehicles(req):
     }
     return render(req, "vehicles.html", context);
 
+@authenticated_already
 def login_view(req):
-    err = None;
     form = AuthenticationForm();
     if req.method == "POST":
         form = AuthenticationForm(data=req.POST);
@@ -51,17 +56,35 @@ def login_view(req):
             user = authenticate(username=username, password=password);
             if user is not None:
                 login(req, user);
+                messages.success(req, "login successful " + user.get_username());
                 if req.GET.get("next"):
                     return redirect(req.GET.get("next"));
                 else: return redirect("home");
-        else: err = "From not valid";
+        else: messages.error(req, "From not valid");
 
     context = {
         "nav": nav,
         "form": form,
-        "err": err,
     };
     return render(req, "login.html", context);
 def logout_view(req):
     logout(req);
     return redirect("home");
+
+@authenticated_already
+def register_view(req):
+    form = CreateUserForm();
+    if req.method == "POST":
+        form = CreateUserForm(data=req.POST);
+        if form.is_valid():
+            user = form.save();
+            grp = Group.objects.get(name="owner");
+            user.groups.add(grp);
+            messages.success(req, "successfully registered");
+            return redirect("login");
+    
+    context = {
+        "nav": nav,
+        "form": form,
+    }
+    return render(req, "register.html", context);

@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
+{% block title %}welcome{% endblock title %}
+
 {% block content %}
-    <h1>Hello</h1>
-    ok
+    <h1>Hello, {% if user.is_authenticated %}{{user}}{% else %}Guest{% endif %}</h1>
+    User groups: {{user.groups.all}}
 {% endblock content %}

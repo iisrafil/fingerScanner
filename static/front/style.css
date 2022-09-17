@@ -6,3 +6,6 @@ body {
     padding: 20px;
     background-color: aquamarine;
 }
+a, button, title {
+    text-transform: capitalize;
+}
