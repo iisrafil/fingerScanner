@@ -11,3 +11,9 @@ class CreateUserForm(UserCreationForm):
         model = Account;
         fields = UserCreationForm.Meta.fields + ("email", "address");
         # fields = "__all__";
+
+
+class ProfileUpdateForm(ModelForm):
+    class Meta():
+        model = Account;
+        fields = ("email", "address");

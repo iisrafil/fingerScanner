@@ -7,16 +7,17 @@
     {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
     <table>
         <tr>
-            {% for colTitle in users.0 %}
-            <th>{{colTitle}}</th>
-            {% endfor %}
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th><Address>Address</Address></th>
         </tr>
-        {% for user in users|slice:"1:" %}
+        {% for user in users %}
         <tr>
-            {% for val in user|slice:":-1" %}
-            <th>{{val}}</th>
-            {% endfor %}
-            <th><img src="{{user|last}}" alt="{{user|last}}"></th>
+            <th>{{user.id}}</th>
+            <th><a href="{% url 'owner' %}?pk={{user.id}}">{{user.username}}</a></th>
+            <th>{{user.email}}</th>
+            <th>{{user.address}}</th>
         </tr>
         {% endfor %}
     </table>

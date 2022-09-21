@@ -1,3 +1,4 @@
+from urllib import request
 from django.shortcuts import render, redirect;
 from front.utils import getUsers;
 from django.contrib.auth import authenticate, login, logout
@@ -5,50 +6,70 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm;
 from django.contrib.auth.decorators import login_required;
 from django.contrib.auth.models import Group;
 from django.contrib import messages;
+from django.db.models.query import QuerySet;
+from django.http import HttpRequest;
 # from django.contrib.auth.mixins import LoginRequiredMixin;
-from .forms import CreateUserForm;
+from .forms import CreateUserForm, ProfileUpdateForm;
 from .decorators import authenticated_already, allowed_users;
 from .utils import get_chart;
+from .models import Account;
 
 # Create your views here.
 
 nav = ["home", "about", "owners", "vehicles"];
 
-def front(req):
+def front(req: HttpRequest):
     context = {
         "nav": nav,
         "img": get_chart(),
-    }
+    };
     return render(req, "home.html", context);
 
-def about(req):
+def about(req: HttpRequest):
     context = {
         "nav": nav,
-    }
+    };
     return render(req, "about.html", context);
 
 @login_required(login_url="login")
-@allowed_users({"law"})
-def owners(req):
-    data = getUsers()["data"];
-    # data = [{"a": 1}];
-    users = [list(data[0].keys())];
-    users += [list(user.values()) for user in data];
+@allowed_users({"law", "owner"})
+def owners(req: HttpRequest):
+    users = Account.objects.filter(groups__name__in=["owner"]);
     
     context = {
         "nav": nav,
         "users": users,
-    }
+    };
     return render(req, "owners.html", context);
 
-def vehicles(req):
+@login_required
+@allowed_users({"law", "owner"})
+def owner(req: HttpRequest):
+    pk = int(req.GET.get("pk"));
+    if req.user.id != pk:
+        messages.info(req, "Not your profile");
+        return redirect("home");
+    form = ProfileUpdateForm(instance=req.user);
+    if req.method == "POST":
+        form = ProfileUpdateForm(data=req.POST, instance=req.user);
+        if form.is_valid():
+            form.save();
+            messages.success(req, "Profile Updated");
+            return redirect("owners");
     context = {
         "nav": nav,
-    }
+        "form": form,
+    };
+    return render(req, "owner.html", context);
+
+def vehicles(req: HttpRequest):
+    context = {
+        "nav": nav,
+    };
     return render(req, "vehicles.html", context);
 
 @authenticated_already
-def login_view(req):
+def login_view(req: HttpRequest):
     form = AuthenticationForm();
     if req.method == "POST":
         form = AuthenticationForm(data=req.POST);
@@ -69,12 +90,12 @@ def login_view(req):
         "form": form,
     };
     return render(req, "login.html", context);
-def logout_view(req):
+def logout_view(req: HttpRequest):
     logout(req);
     return redirect("home");
 
 @authenticated_already
-def register_view(req):
+def register_view(req: HttpRequest):
     form = CreateUserForm();
     if req.method == "POST":
         form = CreateUserForm(data=req.POST);
@@ -88,5 +109,5 @@ def register_view(req):
     context = {
         "nav": nav,
         "form": form,
-    }
+    };
     return render(req, "register.html", context);
