@@ -132,3 +132,5 @@ INTERNAL_IPS = [
 
 # AUTH
 LOGIN_URL = "/front/login/";
+
+AUTH_USER_MODEL = "front.Account"

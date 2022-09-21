@@ -28,7 +28,7 @@ def about(req):
     return render(req, "about.html", context);
 
 @login_required(login_url="login")
-@allowed_users(["admin", "law"])
+@allowed_users({"law"})
 def owners(req):
     data = getUsers()["data"];
     # data = [{"a": 1}];

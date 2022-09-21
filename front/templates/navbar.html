@@ -11,5 +11,9 @@
         {% else %}
         <a href="{% url 'login' %}">login</a>
         {% endif %}
+        
+        {% if user.is_superuser %}
+        <a href="/admin">admin</a>
+        {% endif %}
     </div>
 </nav>
