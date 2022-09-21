@@ -1,1 +1,7 @@
-
+setuptools==63.2.0
+Django==4.0.6
+Pillow==8.3.2
+djangorestframework==3.13.1
+django-crispy-forms==1.10.0
+numpy==1.23.2
+opencv-python==4.6.0.66
