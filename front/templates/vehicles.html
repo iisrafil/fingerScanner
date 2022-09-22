@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}vehicles{% endblock title %}
+
+{% block content %}
+    <h1>Vehicles</h1>
+    {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>License</th>
+            <th>Owner</th>
+            <th>Last Location</th>
+        </tr>
+        {% for bus in vehicles %}
+        <tr>
+            <th>{{bus.id}}</th>
+            <th>{{bus.license_no}}</th>
+            <th><a href="{% url 'owner' %}?pk={{user.id}}">{{bus.owner.username}}</a></th>
+            <th>{{bus.last_location}}</th>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}

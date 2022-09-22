@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}vehicle{% endblock title %}
+
+{% block content %}
+    <h1>Vehicle: {{user.username}}</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit">{% if request.GET.vid %}Update{% else %}Add{% endif %}</button>
+    </form>
+{% endblock content %}

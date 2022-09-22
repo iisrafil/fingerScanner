@@ -1,4 +1,3 @@
-from urllib import request
 from django.shortcuts import render, redirect;
 from front.utils import getUsers;
 from django.contrib.auth import authenticate, login, logout
@@ -8,11 +7,13 @@ from django.contrib.auth.models import Group;
 from django.contrib import messages;
 from django.db.models.query import QuerySet;
 from django.http import HttpRequest;
-# from django.contrib.auth.mixins import LoginRequiredMixin;
-from .forms import CreateUserForm, ProfileUpdateForm;
-from .decorators import authenticated_already, allowed_users;
+from django.http.request import QueryDict;
+# from django.contrib.auth.mixins import
+#  LoginRequiredMixin;
+from .forms import *;
+from .decorators import *;
 from .utils import get_chart;
-from .models import Account;
+from .models import *;
 
 # Create your views here.
 
@@ -46,10 +47,10 @@ def owners(req: HttpRequest):
 @allowed_users({"law", "owner"})
 def owner(req: HttpRequest):
     pk = int(req.GET.get("pk"));
-    if req.user.id != pk:
+    if not (req.user.is_superuser or req.user.id == pk):
         messages.info(req, "Not your profile");
         return redirect("home");
-    form = ProfileUpdateForm(instance=req.user);
+    form = ProfileUpdateForm(instance=req.user, initial={"password": ""});
     if req.method == "POST":
         form = ProfileUpdateForm(data=req.POST, instance=req.user);
         if form.is_valid():
@@ -74,13 +75,14 @@ def admins(req: HttpRequest):
     return render(req, "admins.html", context);
 
 @login_required
-@allowed_users({"law"})
+@allowed_users({})
 def admin(req: HttpRequest):
     pk = int(req.GET.get("pk"));
     if req.user.id != pk:
         messages.info(req, "Not your profile");
         return redirect("home");
-    form = ProfileUpdateForm(instance=req.user);
+    form = ProfileUpdateForm(instance=req.user, initial={"password": ""});
+    print(form.data.keys())
     if req.method == "POST":
         form = ProfileUpdateForm(data=req.POST, instance=req.user);
         if form.is_valid():
@@ -108,10 +110,10 @@ def laws(req: HttpRequest):
 @allowed_users({"law"})
 def law(req: HttpRequest):
     pk = int(req.GET.get("pk"));
-    if req.user.id != pk:
+    if not (req.user.is_superuser or req.user.id == pk):
         messages.info(req, "Not your profile");
         return redirect("home");
-    form = ProfileUpdateForm(instance=req.user);
+    form = ProfileUpdateForm(instance=req.user, initial={"password": ""});
     if req.method == "POST":
         form = ProfileUpdateForm(data=req.POST, instance=req.user);
         if form.is_valid():
@@ -124,11 +126,45 @@ def law(req: HttpRequest):
     };
     return render(req, "law.html", context);
 
+@login_required
+@allowed_users({"law"})
 def vehicles(req: HttpRequest):
+    vehicles = Vehicle.objects.all();
+
     context = {
         "nav": nav,
+        "vehicles": vehicles,
     };
     return render(req, "vehicles.html", context);
+
+@login_required
+@allowed_users({"owner"})
+def vehicle(req: HttpRequest):
+    oid = int(req.GET.get("oid"));
+    if not (req.user.is_superuser or req.user.id == oid):
+        messages.info(req, "Not your profile");
+        return redirect("home");
+    vid = cur_v = None;
+    try:
+        vid = int(req.GET.get("vid"));
+        cur_v = Vehicle.objects.get(pk=vid);
+    except: pass;
+    form = VehicleForm(instance=cur_v, initial={"owner": req.user});
+    if not req.user.is_superuser:
+        form.fields["owner"].disabled = True;
+    if req.method == "POST":
+        mod_req = req.POST.copy();
+        mod_req.update({"owner": req.user});
+        form = VehicleForm(data=mod_req, instance=cur_v);
+        if form.is_valid():
+            form.save();
+            messages.success(req, "Vehicle Added");
+            return redirect("owners");
+    context = {
+        "nav": nav,
+        "form": form,
+    };
+    return render(req, "vehicle.html", context);
 
 @authenticated_already
 def login_view(req: HttpRequest):
