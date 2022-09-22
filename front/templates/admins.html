@@ -10,14 +10,14 @@
             <th>ID</th>
             <th>Username</th>
             <th>Email</th>
-            <th><Address>Address</Address></th>
+            <th>Address</th>
         </tr>
         {% for user in users %}
         <tr>
-            <th>{{user.id}}</th>
-            <th><a href="{% url 'admin' %}?pk={{user.id}}">{{user.username}}</a></th>
-            <th>{{user.email}}</th>
-            <th>{{user.address}}</th>
+            <td>{{user.id}}</td>
+            <td><a href="{% url 'admin' %}?pk={{user.id}}">{{user.username}}</a></td>
+            <td>{{user.email}}</td>
+            <td><Address>{{user.address}}</Address></td>
         </tr>
         {% endfor %}
     </table>

@@ -12,6 +12,7 @@ urlpatterns = [
     path("law/", views.law, name="law"),
     path("vehicles/", views.vehicles, name="vehicles"),
     path("vehicle/", views.vehicle, name="vehicle"),
+    path("v_approve/", views.v_approve, name="v_approve"),
     
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),

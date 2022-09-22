@@ -11,3 +11,4 @@ class Vehicle(models.Model):
 
     license_no = models.CharField(max_length=50, unique=True);
     last_location = models.CharField(max_length=100, null=True);
+    approved = models.BooleanField(default=False);

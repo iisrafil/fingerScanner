@@ -50,9 +50,9 @@ def owner(req: HttpRequest):
     if not (req.user.is_superuser or req.user.id == pk):
         messages.info(req, "Not your profile");
         return redirect("home");
-    form = ProfileUpdateForm(instance=req.user, initial={"password": ""});
+    form = ProfileUpdateForm(initial=Account.objects.get(pk=pk).__dict__);
     if req.method == "POST":
-        form = ProfileUpdateForm(data=req.POST, instance=req.user);
+        form = ProfileUpdateForm(data=req.POST);
         if form.is_valid():
             form.save();
             messages.success(req, "Profile Updated");
@@ -75,16 +75,16 @@ def admins(req: HttpRequest):
     return render(req, "admins.html", context);
 
 @login_required
-@allowed_users({})
+@allowed_users(set())
 def admin(req: HttpRequest):
     pk = int(req.GET.get("pk"));
     if req.user.id != pk:
         messages.info(req, "Not your profile");
         return redirect("home");
-    form = ProfileUpdateForm(instance=req.user, initial={"password": ""});
-    print(form.data.keys())
+    form = ProfileUpdateForm(initial=Account.objects.get(pk=pk).__dict__);
+    # print(form.data.keys())
     if req.method == "POST":
-        form = ProfileUpdateForm(data=req.POST, instance=req.user);
+        form = ProfileUpdateForm(data=req.POST);
         if form.is_valid():
             form.save();
             messages.success(req, "Profile Updated");
@@ -113,9 +113,9 @@ def law(req: HttpRequest):
     if not (req.user.is_superuser or req.user.id == pk):
         messages.info(req, "Not your profile");
         return redirect("home");
-    form = ProfileUpdateForm(instance=req.user, initial={"password": ""});
+    form = ProfileUpdateForm(initial=Account.objects.get(pk=pk).__dict__);
     if req.method == "POST":
-        form = ProfileUpdateForm(data=req.POST, instance=req.user);
+        form = ProfileUpdateForm(data=req.POST);
         if form.is_valid():
             form.save();
             messages.success(req, "Profile Updated");
@@ -165,6 +165,17 @@ def vehicle(req: HttpRequest):
         "form": form,
     };
     return render(req, "vehicle.html", context);
+
+@login_required
+@allowed_users(set())
+def v_approve(req: HttpRequest):
+    try:
+        v: Vehicle = Vehicle.objects.get(pk=req.GET.get("pk"));
+        v.approved = True;
+        v.save();
+    except:
+        Vehicle.objects.update(approved=True);
+    return redirect("vehicles");
 
 @authenticated_already
 def login_view(req: HttpRequest):

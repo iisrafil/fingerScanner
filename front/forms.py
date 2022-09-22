@@ -15,9 +15,10 @@ class CreateUserForm(UserCreationForm):
 class ProfileUpdateForm(ModelForm):
     class Meta:
         model = Account;
-        fields = ("username", "email", "address", "password");
+        fields = ("username", "email", "address");
 
 class VehicleForm(ModelForm):
     class Meta:
         model = Vehicle;
         fields = "__all__";
+        exclude = ("approved", );
