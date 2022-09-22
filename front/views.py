@@ -17,7 +17,7 @@ from .models import *;
 
 # Create your views here.
 
-nav = ["home", "about", "owners", "admins", "laws", "vehicles"];
+nav = ["home", "about", "owners", "admins", "laws", "vehicles", "drivers"];
 
 def front(req: HttpRequest):
     context = {
@@ -176,6 +176,43 @@ def v_approve(req: HttpRequest):
     except:
         Vehicle.objects.update(approved=True);
     return redirect("vehicles");
+
+@login_required
+@allowed_users({"law"})
+def drivers(req: HttpRequest):
+    drivers = Driver.objects.all();
+
+    context = {
+        "nav": nav,
+        "drivers": drivers,
+    };
+    return render(req, "drivers.html", context);
+
+@login_required
+@allowed_users({"owner"})
+def driver(req: HttpRequest):
+    pk = None;
+    form = DriverForm();
+    try:
+        pk = int(req.GET.get("pk"));
+        if not (req.user.is_superuser or req.user.id in Account.objects.filter(vehicle_set__driver_set__id=pk)):
+            messages.info(req, "Not your profile");
+            return redirect("home");
+        form = DriverForm(initial=Driver.objects.get(pk=pk).__dict__);
+    except: pass;
+    if req.method == "POST":
+        form = DriverForm(data=req.POST);
+        if form.is_valid():
+            form.save();
+            messages.success(req, "Profile Updated");
+            return redirect("drivers");
+    context = {
+        "nav": nav,
+        "form": form,
+    };
+    return render(req, "driver.html", context);
+
+################# A U T H #######################
 
 @authenticated_already
 def login_view(req: HttpRequest):

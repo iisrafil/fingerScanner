@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin;
 
-from front.models import Account;
+from front.models import *;
 from front.forms import CreateUserForm;
 
 class AccountUserAdmin(UserAdmin):
@@ -22,3 +22,6 @@ class AccountUserAdmin(UserAdmin):
 
 # Register your models here.
 admin.site.register(Account, AccountUserAdmin);
+
+admin.site.register(Vehicle);
+admin.site.register(Driver);

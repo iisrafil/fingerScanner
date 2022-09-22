@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}drivers{% endblock title %}
+
+{% block content %}
+    <h1>Driver</h1>
+    {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>License No</th>
+            <th>Address</th>
+        </tr>
+        {% for driver in drivers %}
+        <tr>
+            <td>{{driver.id}}</td>
+            <td><a href="{% url 'driver' %}?pk={{driver.id}}">{{driver.name}}</a></td>
+            <td>{{driver.license_no}}</td>
+            <td><Address>{{driver.address}}</Address></td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <a href="{% url 'driver' %}">Add</a>
+{% endblock content %}

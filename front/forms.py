@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm;
 from django.contrib.auth.models import User;
 from django import forms
 
-from front.models import Account, Vehicle;
+from front.models import *;
 
 class CreateUserForm(UserCreationForm):
     # address = forms.CharField(max_length=100);
@@ -22,3 +22,8 @@ class VehicleForm(ModelForm):
         model = Vehicle;
         fields = "__all__";
         exclude = ("approved", );
+
+class DriverForm(ModelForm):
+    class Meta:
+        model = Driver;
+        fields = "__all__";
