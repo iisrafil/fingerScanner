@@ -16,7 +16,7 @@ from .models import Account;
 
 # Create your views here.
 
-nav = ["home", "about", "owners", "vehicles"];
+nav = ["home", "about", "owners", "admins", "laws", "vehicles"];
 
 def front(req: HttpRequest):
     context = {
@@ -61,6 +61,68 @@ def owner(req: HttpRequest):
         "form": form,
     };
     return render(req, "owner.html", context);
+
+@login_required(login_url="login")
+@allowed_users({"law"})
+def admins(req: HttpRequest):
+    users = Account.objects.filter(groups__isnull=True);
+    
+    context = {
+        "nav": nav,
+        "users": users,
+    };
+    return render(req, "admins.html", context);
+
+@login_required
+@allowed_users({"law"})
+def admin(req: HttpRequest):
+    pk = int(req.GET.get("pk"));
+    if req.user.id != pk:
+        messages.info(req, "Not your profile");
+        return redirect("home");
+    form = ProfileUpdateForm(instance=req.user);
+    if req.method == "POST":
+        form = ProfileUpdateForm(data=req.POST, instance=req.user);
+        if form.is_valid():
+            form.save();
+            messages.success(req, "Profile Updated");
+            return redirect("admins");
+    context = {
+        "nav": nav,
+        "form": form,
+    };
+    return render(req, "admin.html", context);
+
+@login_required(login_url="login")
+@allowed_users({"law"})
+def laws(req: HttpRequest):
+    users = Account.objects.filter(groups__name__in=["law"]);
+    
+    context = {
+        "nav": nav,
+        "users": users,
+    };
+    return render(req, "laws.html", context);
+
+@login_required
+@allowed_users({"law"})
+def law(req: HttpRequest):
+    pk = int(req.GET.get("pk"));
+    if req.user.id != pk:
+        messages.info(req, "Not your profile");
+        return redirect("home");
+    form = ProfileUpdateForm(instance=req.user);
+    if req.method == "POST":
+        form = ProfileUpdateForm(data=req.POST, instance=req.user);
+        if form.is_valid():
+            form.save();
+            messages.success(req, "Profile Updated");
+            return redirect("laws");
+    context = {
+        "nav": nav,
+        "form": form,
+    };
+    return render(req, "law.html", context);
 
 def vehicles(req: HttpRequest):
     context = {

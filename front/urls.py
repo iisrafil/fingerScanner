@@ -6,6 +6,10 @@ urlpatterns = [
     path("about/", views.about, name="about"),
     path("owners/", views.owners, name="owners"),
     path("owner/", views.owner, name="owner"),
+    path("admins/", views.admins, name="admins"),
+    path("admin/", views.admin, name="admin"),
+    path("laws/", views.laws, name="laws"),
+    path("law/", views.law, name="law"),
     path("vehicles/", views.vehicles, name="vehicles"),
     
     path("login/", views.login_view, name="login"),
