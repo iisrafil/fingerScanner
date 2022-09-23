@@ -15,6 +15,8 @@ urlpatterns = [
     path("v_approve/", views.v_approve, name="v_approve"),
     path("drivers/", views.drivers, name="drivers"),
     path("driver/", views.driver, name="driver"),
+
+    path("delete/", views.delete, name="delete"),
     
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),

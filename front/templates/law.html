@@ -9,4 +9,5 @@
         {{form.as_p}}
         <button type="submit">Update</button>
     </form>
+    <a href="{% url 'delete' %}?type=law&amp;pk={{pk}}">Delete</a>
 {% endblock content %}

@@ -60,6 +60,7 @@ def owner(req: HttpRequest):
     context = {
         "nav": nav,
         "form": form,
+        "pk": pk,
     };
     return render(req, "owner.html", context);
 
@@ -123,6 +124,7 @@ def law(req: HttpRequest):
     context = {
         "nav": nav,
         "form": form,
+        "pk": pk,
     };
     return render(req, "law.html", context);
 
@@ -163,6 +165,7 @@ def vehicle(req: HttpRequest):
     context = {
         "nav": nav,
         "form": form,
+        "pk": vid,
     };
     return render(req, "vehicle.html", context);
 
@@ -209,8 +212,29 @@ def driver(req: HttpRequest):
     context = {
         "nav": nav,
         "form": form,
+        "pk": pk,
     };
     return render(req, "driver.html", context);
+
+@login_required
+@allowed_users({"owner"})
+def delete(req: HttpRequest):
+    type = req.GET.get("type");
+    try:
+        pk = int(req.GET.get("pk"));
+        if type in ["admin", "owner", "law"]:
+            tmp = Account.objects.get(pk=pk);
+            tmp.delete();
+        elif type == "driver":
+            tmp = Driver.objects.get(pk=pk);
+            tmp.delete();
+        else: 
+            tmp = Vehicle.objects.get(pk=pk);
+            tmp.delete();
+        messages.info(req, "Deleted :"+type);
+    except Exception as e: 
+        messages.error(req, "Delete error: "+str(e));
+    return redirect(type+"s");
 
 ################# A U T H #######################
 

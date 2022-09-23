@@ -9,4 +9,5 @@
         {{form.as_p}}
         <button type="submit">{% if request.GET.vid %}Update{% else %}Add{% endif %}</button>
     </form>
+    <a href="{% url 'delete' %}?type=vehicle&amp;pk={{pk}}">Delete</a>
 {% endblock content %}
