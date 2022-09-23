@@ -131,7 +131,12 @@ def law(req: HttpRequest):
 @login_required
 @allowed_users({"law"})
 def vehicles(req: HttpRequest):
-    vehicles = Vehicle.objects.all();
+    vehicles = None;
+    try:
+        oid = int(req.GET.get("oid"));
+        vehicles = Vehicle.objects.filter(owner__id=oid);
+    except:
+        vehicles = Vehicle.objects.all();
 
     context = {
         "nav": nav,

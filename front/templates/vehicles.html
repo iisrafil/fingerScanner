@@ -15,7 +15,7 @@
         </tr>
         {% for bus in vehicles %}
         <tr>
-            <td>{{bus.id}}</td>
+            <td><a href="{% url 'vehicle' %}?oid={{user.id}}&amp;vid={{bus.id}}">{{bus.id}}</a></td>
             <td>{{bus.license_no}}</td>
             <td><a href="{% url 'owner' %}?pk={{bus.owner.id}}">{{bus.owner.username}}</a></td>
             <td>{{bus.last_location}}</td>
