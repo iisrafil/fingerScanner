@@ -11,6 +11,8 @@
             <th>Name</th>
             <th>License No</th>
             <th>Address</th>
+            <th>Vehicles</th>
+            <th>Approval Status</th>
         </tr>
         {% for driver in drivers %}
         <tr>
@@ -18,9 +20,26 @@
             <td><a href="{% url 'driver' %}?pk={{driver.id}}">{{driver.name}}</a></td>
             <td>{{driver.license_no}}</td>
             <td><Address>{{driver.address}}</Address></td>
+            <td>
+                -&nbsp;
+                <a href="{% url 'vehicles' %}?did={{driver.id}}">{{driver.vehicles.count}}</a>&nbsp;
+                +
+            </td>
+            <td>{% if driver.approved %}
+                Approved
+            {% else %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'approve' %}?type=driver&amp;pk={{driver.id}}">Approve</a>
+                {% else %}
+                    Pending
+                {% endif %}
+            {% endif %}</td>
         </tr>
         {% endfor %}
     </table>
+    {% if request.user.is_superuser %}
+        <a href="{% url 'approve' %}?type=driver">Approve All</a>
+    {% endif %}
     
     <a href="{% url 'driver' %}">Add</a>
 {% endblock content %}

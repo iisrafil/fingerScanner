@@ -12,9 +12,11 @@ urlpatterns = [
     path("law/", views.law, name="law"),
     path("vehicles/", views.vehicles, name="vehicles"),
     path("vehicle/", views.vehicle, name="vehicle"),
-    path("v_approve/", views.v_approve, name="v_approve"),
     path("drivers/", views.drivers, name="drivers"),
+    path("add_vtod/", views.add_vtod, name="add_vtod"),
     path("driver/", views.driver, name="driver"),
+
+    path("approve/", views.approve, name="approve"),
 
     path("delete/", views.delete, name="delete"),
     

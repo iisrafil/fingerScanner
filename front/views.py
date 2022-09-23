@@ -132,10 +132,13 @@ def law(req: HttpRequest):
 @allowed_users({"law"})
 def vehicles(req: HttpRequest):
     vehicles = None;
-    try:
-        oid = int(req.GET.get("oid"));
+    oid = req.GET.get("oid");
+    did = req.GET.get("did");
+    if oid:
         vehicles = Vehicle.objects.filter(owner__id=oid);
-    except:
+    elif did:
+        vehicles = Vehicle.objects.filter(driver__id=did);
+    else:
         vehicles = Vehicle.objects.all();
 
     context = {
@@ -176,25 +179,39 @@ def vehicle(req: HttpRequest):
 
 @login_required
 @allowed_users(set())
-def v_approve(req: HttpRequest):
+def approve(req: HttpRequest):
+    tp = req.GET.get("type");
     try:
-        v: Vehicle = Vehicle.objects.get(pk=req.GET.get("pk"));
+        if tp == "vehicle":
+            v = Vehicle.objects.get(pk=req.GET.get("pk"));
+        else: v = Driver.objects.get(pk=req.GET.get("pk"));
         v.approved = True;
         v.save();
     except:
-        Vehicle.objects.update(approved=True);
-    return redirect("vehicles");
+        if tp == "vehicle":
+            Vehicle.objects.update(approved=True);
+        else: Driver.objects.update(approved=True);
+    return redirect(tp+"s");
 
 @login_required
 @allowed_users({"law"})
 def drivers(req: HttpRequest):
-    drivers = Driver.objects.all();
+    vid = req.GET.get("vid");
+    if vid:
+        drivers = Driver.objects.filter(vehicles__id=vid);
+    else: drivers = Driver.objects.all();
 
     context = {
         "nav": nav,
         "drivers": drivers,
     };
     return render(req, "drivers.html", context);
+
+@login_required
+@allowed_users({"owner"})
+def add_vtod(req: HttpRequest):
+
+    return redirect("vehicles");
 
 @login_required
 @allowed_users({"owner"})

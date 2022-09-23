@@ -11,6 +11,7 @@
             <th>License</th>
             <th>Owner</th>
             <th>Last Location</th>
+            <th>Drivers</th>
             <th>Approval Status</th>
         </tr>
         {% for bus in vehicles %}
@@ -19,19 +20,24 @@
             <td>{{bus.license_no}}</td>
             <td><a href="{% url 'owner' %}?pk={{bus.owner.id}}">{{bus.owner.username}}</a></td>
             <td>{{bus.last_location}}</td>
+            <td>
+                -&nbsp;
+                <a href="{% url 'drivers' %}?vid={{bus.id}}">{{bus.driver_set.count}}</a>&nbsp;
+                +
+            </td>
             <td>{% if bus.approved %}
                 Approved
             {% else %}
                 {% if request.user.is_superuser %}
-                    <a href="{% url 'v_approve' %}?pk={{bus.id}}">Approve</a>
-                    {% else %}
+                    <a href="{% url 'approve' %}?type=vehicle&amp;pk={{bus.id}}">Approve</a>
+                {% else %}
                     Pending
-                    {% endif %}
-                    {% endif %}</td>
+                {% endif %}
+            {% endif %}</td>
         </tr>
         {% endfor %}
     </table>
     {% if request.user.is_superuser %}
-        <a href="{% url 'v_approve' %}">Approve All</a>
+        <a href="{% url 'approve' %}?type=vehicle">Approve All</a>
     {% endif %}
 {% endblock content %}
