@@ -7,6 +7,9 @@ from front.models import *;
 
 class CreateUserForm(UserCreationForm):
     # address = forms.CharField(max_length=100);
+    type = forms.ChoiceField(choices=(
+        ("owner", "Owner"), ("law", "Law"),
+    ));
     class Meta(UserCreationForm.Meta):
         model = Account;
         fields = UserCreationForm.Meta.fields + ("email", "address");

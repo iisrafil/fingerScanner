@@ -344,7 +344,7 @@ def register_view(req: HttpRequest):
         form = CreateUserForm(data=req.POST);
         if form.is_valid():
             user = form.save();
-            grp = Group.objects.get(name="pending");
+            grp = Group.objects.get(name="pending_"+form.data["type"]);
             user.groups.add(grp);
             messages.success(req, "successfully registered");
             return redirect("login");
