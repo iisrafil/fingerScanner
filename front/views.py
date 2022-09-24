@@ -340,9 +340,6 @@ def logout_view(req: HttpRequest):
 @authenticated_already
 def register_view(req: HttpRequest):
     form = CreateUserForm();
-    form.base_fields["type"] = forms.ChoiceField(choices=(
-        ("owner", "Owner"), ("law", "Law"),
-    ));
     if req.method == "POST":
         form = CreateUserForm(data=req.POST);
         if form.is_valid():
