@@ -9,5 +9,7 @@
         {{form.as_p}}
         <button type="submit">Update</button>
     </form>
-    <a href="{% url 'delete' %}?type=driver&amp;pk={{pk}}">Delete</a>
+    {% if request.user.is_superuser %}
+        <a href="{% url 'delete' %}?type=driver&amp;pk={{pk}}">Delete</a>
+    {% endif %}
 {% endblock content %}

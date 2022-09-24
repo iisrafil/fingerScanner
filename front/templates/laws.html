@@ -11,6 +11,7 @@
             <th>Username</th>
             <th>Email</th>
             <th>Address</th>
+            <th>Approval Status</th>
         </tr>
         {% for user in users %}
         <tr>
@@ -18,6 +19,15 @@
             <td><a href="{% url 'law' %}?pk={{user.id}}">{{user.username}}</a></td>
             <td>{{user.email}}</td>
             <td><Address>{{user.address}}</Address></td>
+            <td>{% if user.approved %}
+                Approved
+            {% else %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'approve' %}?type=law&amp;pk={{user.id}}">Approve</a>
+                {% else %}
+                    Pending
+                {% endif %}
+            {% endif %}</td>
         </tr>
         {% endfor %}
     </table>

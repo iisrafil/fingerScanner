@@ -20,10 +20,19 @@ class ProfileUpdateForm(ModelForm):
 class VehicleForm(ModelForm):
     class Meta:
         model = Vehicle;
-        fields = "__all__";
+        fields = "__all__";# [f.name for f in Vehicle._meta.get_fields()];
         exclude = ("approved", );
 
 class DriverForm(ModelForm):
     class Meta:
         model = Driver;
-        fields = "__all__";
+        fields = "__all__";# [f.name for f in Driver._meta.get_fields()];
+        exclude = ("approved", "vehicles");
+    # vehicles = forms.ModelMultipleChoiceField(
+    #     queryset=None,
+    #     widget=forms.CheckboxSelectMultiple
+    # );
+    # def __init__(self, *args, **kwargs):
+    #     self.pk = kwargs.pop("pk")
+    #     super(DriverForm, self).__init__(*args, **kwargs)
+    #     self.fields['vehicles'].queryset = Vehicle.objects.filter(driver_det__id=self.pk);

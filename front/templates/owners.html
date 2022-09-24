@@ -7,21 +7,12 @@
     {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
     <table>
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Address</th>
-                <th>Vehicles</th>
-            </tr>
-            <tr>
-                {% comment %} <th></th>
-                <th></th>
-                <th></th> {% endcomment %}
-                <th>ID</th>
-                <th>License No.</th>
-                <th>Last Location</th>
-            </tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Vehicles</th>
+            <th>Approval Status</th>
         </thead>
         <tbody>
             {% for user in users %}
@@ -32,8 +23,19 @@
                 <td><Address>{{user.address}}</Address></td>
                 <td>
                     <a href="{% url 'vehicles' %}?oid={{user.id}}">{{user.vehicle_set.all.count}}</a>&nbsp;
-                    <a href="{% url 'vehicle' %}?oid={{user.id}}">+</a>
+                    {% if user.approved %}{% if request.user.groups.all.0.name != 'law' %}
+                        <a href="{% url 'vehicle' %}?oid={{user.id}}">+</a>
+                    {% endif %}{% endif %}
                 </td>
+                <td>{% if user.approved %}
+                    Approved
+                {% else %}
+                    {% if request.user.is_superuser %}
+                        <a href="{% url 'approve' %}?type=owner&amp;pk={{user.id}}">Approve</a>
+                    {% else %}
+                        Pending
+                    {% endif %}
+                {% endif %}</td>
             </tr>
             {% endfor %}
         </tbody>

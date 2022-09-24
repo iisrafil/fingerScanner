@@ -21,9 +21,9 @@
             <td>{{driver.license_no}}</td>
             <td><Address>{{driver.address}}</Address></td>
             <td>
-                -&nbsp;
+                {% comment %} <a href="{% url 'dtov' %}?action=rm&amp;did={{driver.id}}">-</a>&nbsp; {% endcomment %}
                 <a href="{% url 'vehicles' %}?did={{driver.id}}">{{driver.vehicles.count}}</a>&nbsp;
-                +
+                {% comment %} <a href="{% url 'dtov' %}?action=add&amp;did={{driver.id}}">+</a> {% endcomment %}
             </td>
             <td>{% if driver.approved %}
                 Approved
@@ -41,5 +41,7 @@
         <a href="{% url 'approve' %}?type=driver">Approve All</a>
     {% endif %}
     
-    <a href="{% url 'driver' %}">Add</a>
+    {% if request.user.groups.all.0.name != 'law' %}
+        <a href="{% url 'driver' %}">Add</a>
+    {% endif %}
 {% endblock content %}

@@ -35,7 +35,9 @@ def about(req: HttpRequest):
 @login_required(login_url="login")
 @allowed_users({"law", "owner"})
 def owners(req: HttpRequest):
-    users = Account.objects.filter(groups__name__in=["owner"]);
+    if "owner" in str(req.user.groups.all()):
+        users = Account.objects.filter(groups__name__in=["owner", "pending_owner"], id=req.user.id);
+    else: users = Account.objects.filter(groups__name__in=["owner", "pending_owner"]);
     
     context = {
         "nav": nav,
@@ -99,7 +101,7 @@ def admin(req: HttpRequest):
 @login_required(login_url="login")
 @allowed_users({"law"})
 def laws(req: HttpRequest):
-    users = Account.objects.filter(groups__name__in=["law"]);
+    users = Account.objects.filter(groups__name__in=["law", "pending_law"]);
     
     context = {
         "nav": nav,
@@ -129,12 +131,14 @@ def law(req: HttpRequest):
     return render(req, "law.html", context);
 
 @login_required
-@allowed_users({"law"})
+@allowed_users({"law", "owner"})
 def vehicles(req: HttpRequest):
     vehicles = None;
     oid = req.GET.get("oid");
     did = req.GET.get("did");
-    if oid:
+    if "owner" in str(req.user.groups.all()):
+        vehicles = Vehicle.objects.filter(owner__id=req.user.id);
+    elif oid:
         vehicles = Vehicle.objects.filter(owner__id=oid);
     elif did:
         vehicles = Vehicle.objects.filter(driver__id=did);
@@ -154,22 +158,24 @@ def vehicle(req: HttpRequest):
     if not (req.user.is_superuser or req.user.id == oid):
         messages.info(req, "Not your profile");
         return redirect("home");
-    vid = cur_v = None;
+    form = vid = cur_v = None;
     try:
         vid = int(req.GET.get("vid"));
         cur_v = Vehicle.objects.get(pk=vid);
-    except: pass;
-    form = VehicleForm(instance=cur_v, initial={"owner": req.user});
+        form = VehicleForm(instance=cur_v, initial={"owner": cur_v.owner});
+    except:
+        form = VehicleForm(initial={"owner": Account.objects.get(pk=oid)});
     if not req.user.is_superuser:
         form.fields["owner"].disabled = True;
     if req.method == "POST":
         mod_req = req.POST.copy();
-        mod_req.update({"owner": req.user});
+        if not req.user.is_superuser:
+            mod_req.update({"owner": req.user});
         form = VehicleForm(data=mod_req, instance=cur_v);
         if form.is_valid():
             form.save();
             messages.success(req, "Vehicle Added");
-            return redirect("owners");
+            return redirect("vehicles");
     context = {
         "nav": nav,
         "form": form,
@@ -178,27 +184,12 @@ def vehicle(req: HttpRequest):
     return render(req, "vehicle.html", context);
 
 @login_required
-@allowed_users(set())
-def approve(req: HttpRequest):
-    tp = req.GET.get("type");
-    try:
-        if tp == "vehicle":
-            v = Vehicle.objects.get(pk=req.GET.get("pk"));
-        else: v = Driver.objects.get(pk=req.GET.get("pk"));
-        v.approved = True;
-        v.save();
-    except:
-        if tp == "vehicle":
-            Vehicle.objects.update(approved=True);
-        else: Driver.objects.update(approved=True);
-    return redirect(tp+"s");
-
-@login_required
-@allowed_users({"law"})
+@allowed_users({"law", "owner"})
 def drivers(req: HttpRequest):
     vid = req.GET.get("vid");
-    if vid:
-        drivers = Driver.objects.filter(vehicles__id=vid);
+    if vid: drivers = Driver.objects.filter(vehicles__id=vid);
+    # elif "owner" in str(req.user.groups.all()):
+    #     drivers = Driver.objects.filter(vehicles__owner__id=req.user.id);
     else: drivers = Driver.objects.all();
 
     context = {
@@ -220,11 +211,11 @@ def driver(req: HttpRequest):
     form = DriverForm();
     try:
         pk = int(req.GET.get("pk"));
-        if not (req.user.is_superuser or req.user.id in Account.objects.filter(vehicle_set__driver_set__id=pk)):
+        if not (req.user.is_superuser or req.user.id in list(Account.objects.filter(vehicle__driver__id=pk).values_list("id", flat=True))):
             messages.info(req, "Not your profile");
             return redirect("home");
         form = DriverForm(initial=Driver.objects.get(pk=pk).__dict__);
-    except: pass;
+    except Exception as e: print(e);
     if req.method == "POST":
         form = DriverForm(data=req.POST);
         if form.is_valid():
@@ -237,6 +228,66 @@ def driver(req: HttpRequest):
         "pk": pk,
     };
     return render(req, "driver.html", context);
+
+@login_required
+@allowed_users({"owner"})
+def vtod(req: HttpRequest):
+    action = req.GET.get("action");
+    vid = req.GET.get("vid");
+    if action == "rm":
+        drivers = Driver.objects.filter(vehicles__id=vid, approved=True);
+    else: 
+        drivers = Driver.objects.exclude(vehicles__id=vid).exclude(approved=False);
+
+    if req.method == "POST":
+        new_dl = [];
+        try: new_dl = req.POST.getlist("linked_drivers");
+        except Exception as e:print(e);
+        drvs = Driver.objects.filter(name__in=new_dl, approved=True);
+        cur_v = Vehicle.objects.get(pk=vid);
+        if action == "rm": cur_v.driver_set.clear();
+        cur_v.driver_set.add(*drvs.values_list("id", flat=True));
+        cur_v.save();
+
+        return redirect("vehicles");
+
+    context = {
+        "nav": nav,
+        "vid": vid,
+        "drivers": drivers,
+        "action": action,
+    };
+    return render(req, "vtod.html", context);
+
+@login_required
+@allowed_users({"owner"})
+def dtov(req: HttpRequest):
+    action = req.GET.get("action");
+    did = req.GET.get("did");
+    if action == "rm":
+        vehicles = Vehicle.objects.filter(driver__id=did, approved=True);
+    else: 
+        vehicles = Vehicle.objects.exclude(driver__id=did).exclude(approved=False);
+
+    if req.method == "POST":
+        new_vl = [];
+        try: new_vl = req.POST.getlist("linked_vehicles");
+        except Exception as e:print(e);
+        new_vl = [int(s.split(":")[0]) for s in new_vl];
+        cur_v = Vehicle.objects.get(pk=did);
+        if action == "rm": cur_v.driver_set.clear();
+        cur_v.driver_set.add(*new_vl);
+        cur_v.save();
+
+        return redirect("vehicles");
+
+    context = {
+        "nav": nav,
+        "did": did,
+        "vehicles": vehicles,
+        "action": action,
+    };
+    return render(req, "dtov.html", context);
 
 @login_required
 @allowed_users({"owner"})
@@ -293,7 +344,7 @@ def register_view(req: HttpRequest):
         form = CreateUserForm(data=req.POST);
         if form.is_valid():
             user = form.save();
-            grp = Group.objects.get(name="owner");
+            grp = Group.objects.get(name="pending");
             user.groups.add(grp);
             messages.success(req, "successfully registered");
             return redirect("login");
@@ -303,3 +354,36 @@ def register_view(req: HttpRequest):
         "form": form,
     };
     return render(req, "register.html", context);
+
+@login_required
+@allowed_users(set())
+def approve(req: HttpRequest):
+    tp = req.GET.get("type");
+    try:
+        if tp == "vehicle":
+            v = Vehicle.objects.get(pk=req.GET.get("pk"));
+            v.approved = True;
+            v.save();
+        elif tp == "driver":
+            d = Driver.objects.get(pk=req.GET.get("pk"));
+            d.approved = True;
+            d.save();
+        elif tp == "owner":
+            o = Account.objects.get(pk=req.GET.get("pk"));
+            o.groups.clear();
+            o.groups.add(Group.objects.get(name="owner").id);
+            o.approved = True;
+            o.save();
+        elif tp == "law":
+            l = Account.objects.get(pk=req.GET.get("pk"));
+            l.groups.clear();
+            l.groups.add(Group.objects.get(name="law").id);
+            l.approved = True;
+            l.save();
+    except Exception as e:
+        if tp == "vehicle":
+            Vehicle.objects.update(approved=True);
+        elif tp == "driver":
+            Driver.objects.update(approved=True);
+        print(e);
+    return redirect(tp+"s");

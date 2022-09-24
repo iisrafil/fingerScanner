@@ -5,6 +5,8 @@ from django.contrib.auth.models import AbstractUser;
 
 class Account(AbstractUser):
     address = models.TextField(max_length=200, default="No Address");
+    
+    approved = models.BooleanField(default=False);
 
 class Vehicle(models.Model):
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, null=False);
@@ -23,6 +25,6 @@ class Driver(models.Model):
     license_no = models.CharField(max_length=50, unique=True, null=False);
     address = models.TextField(max_length=200, default="No Address");
     approved = models.BooleanField(default=False);
-    
+
     def __str__(self) -> str:
         return self.name;
