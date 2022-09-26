@@ -15,6 +15,7 @@ urlpatterns = [
     path("drivers/", views.drivers, name="drivers"),
     path("add_vtod/", views.add_vtod, name="add_vtod"),
     path("driver/", views.driver, name="driver"),
+    path("prints/", views.prints, name="prints"),
     path("vtod/", views.vtod, name="vtod"),
     path("dtov/", views.dtov, name="dtov"),
 

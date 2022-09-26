@@ -26,3 +26,4 @@ admin.site.register(Account, AccountUserAdmin);
 
 admin.site.register(Vehicle);
 admin.site.register(Driver);
+admin.site.register(Fingerprint);

@@ -12,6 +12,7 @@
             <th>License No</th>
             <th>Address</th>
             <th>Vehicles</th>
+            <th>Fingerprints</th>
             <th>Approval Status</th>
         </tr>
         {% for driver in drivers %}
@@ -25,6 +26,7 @@
                 <a href="{% url 'vehicles' %}?did={{driver.id}}">{{driver.vehicles.count}}</a>&nbsp;
                 {% comment %} <a href="{% url 'dtov' %}?action=add&amp;did={{driver.id}}">+</a> {% endcomment %}
             </td>
+            <td><a href="{% url 'prints' %}?did={{driver.id}}">view</a></td>
             <td>{% if driver.approved %}
                 Approved
             {% else %}

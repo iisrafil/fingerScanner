@@ -28,3 +28,14 @@ class Driver(models.Model):
 
     def __str__(self) -> str:
         return self.name;
+
+class Fingerprint(models.Model):
+    of = models.ForeignKey(Driver, on_delete=models.CASCADE, null=False);
+
+    finger = models.CharField(choices=(
+        ("ri", "right_index"), ("rm", "right_middle"), ("rr", "right_ring"), ("rl", "right_little"), ("rt", "right_thumb"), ("li", "left_index"), ("lm", "left_middle"), ("lr", "left_ring"), ("ll", "left_little"), ("lt", "left_thumb"),
+    ), max_length=20);
+    img = models.ImageField(upload_to="prints");
+
+    def __str__(self) -> str:
+        return str(self.of)+":"+self.finger;

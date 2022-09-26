@@ -1,18 +1,21 @@
+import os
 from django.shortcuts import render, redirect;
-from front.utils import getUsers;
+from django.core.files.storage import FileSystemStorage;
+from django.core.files.images import ImageFile;
+from django.conf import settings;
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm;
+from django.contrib.auth.forms import AuthenticationForm;
 from django.contrib.auth.decorators import login_required;
 from django.contrib.auth.models import Group;
 from django.contrib import messages;
-from django.db.models.query import QuerySet;
 from django.http import HttpRequest;
-from django.http.request import QueryDict;
+# from django.db.models.query import QuerySet;
+# from django.http.request import QueryDict;
 # from django.contrib.auth.mixins import
 #  LoginRequiredMixin;
+from .utils import get_chart, getUsers;
 from .forms import *;
 from .decorators import *;
-from .utils import get_chart;
 from .models import *;
 
 # Create your views here.
@@ -228,6 +231,38 @@ def driver(req: HttpRequest):
         "pk": pk,
     };
     return render(req, "driver.html", context);
+
+@login_required
+@allowed_users({"owner"})
+def prints(req: HttpRequest):
+    did = req.GET.get("did");
+    driver = Driver.objects.get(pk=did);
+    if req.method == 'POST':
+        try:
+            f = list(req.FILES.keys())[0].split(":")[1];
+            fin = f.split("_");
+            fin = fin[0][:1] + fin[1][:1];
+            file = req.FILES["prints:"+f];
+            Fingerprint.objects.create(of=driver, finger=fin, img=file);
+        except Exception as e: print(e);
+        response = redirect("prints");
+        response["Location"] += "?did=" + did;
+        return response;
+    prints = [];
+    for f, finger in Fingerprint.finger.field.choices:
+        print_obj = None;
+        try: print_obj = Fingerprint.objects.get(of=did, finger=f);
+        except: pass;
+        prints.append({
+            "finger": finger,
+            "print_obj": print_obj,
+        });
+    context = {
+        "nav": nav,
+        "driver": driver,
+        "prints": prints,
+    };
+    return render(req, "prints.html", context);
 
 @login_required
 @allowed_users({"owner"})
