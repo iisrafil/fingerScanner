@@ -18,14 +18,21 @@ from .forms import *;
 from .decorators import *;
 from .models import *;
 
+import numpy as np;
+import perfplot;
+
 # Create your views here.
 
 nav = ["home", "about", "owners", "admins", "laws", "vehicles", "drivers"];
 
+def call(*args, **kwargs):
+    # perfplot.show(setup=np.random.rand, kernels=[np.sum,sum], n_range=[2**k for k in range(10)]);
+    return;
+
 def front(req: HttpRequest):
     context = {
         "nav": nav,
-        "img": get_chart(),
+        "img": get_chart(call),
     };
     return render(req, "home.html", context);
 

@@ -15,6 +15,7 @@ class AccountUserAdmin(UserAdmin):
                 'fields': (
                     'address',
                     "approved",
+                    "phone",
                 )
             }
         )

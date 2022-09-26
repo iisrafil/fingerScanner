@@ -60,10 +60,11 @@ def get_graph():
     return graph;
 
 
-def get_chart():
+def get_chart(call, *args, **kwargs):
     plt.switch_backend("AGG");
     # plt.imshow(data, origin="lower");
     # p.show(setup=np.random.rand, kernels=[np.sum,sum], n_range=[2**k for k in range(10)]);
+    call(args, kwargs);
     plt.tight_layout();
     chart = get_graph();
     return chart;

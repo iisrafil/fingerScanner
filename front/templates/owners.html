@@ -10,6 +10,7 @@
             <th>ID</th>
             <th>Username</th>
             <th>Email</th>
+            <th>Mobile</th>
             <th>Address</th>
             <th>Vehicles</th>
             <th>Approval Status</th>
@@ -20,6 +21,7 @@
                 <td>{{user.id}}</td>
                 <td><a href="{% url 'owner' %}?pk={{user.id}}">{{user.username}}</a></td>
                 <td>{{user.email}}</td>
+                <td>{{user.phone}}</td>
                 <td><Address>{{user.address}}</Address></td>
                 <td>
                     <a href="{% url 'vehicles' %}?oid={{user.id}}">{{user.vehicle_set.all.count}}</a>&nbsp;

@@ -10,6 +10,7 @@
             <th>ID</th>
             <th>Username</th>
             <th>Email</th>
+            <th>Mobile</th>
             <th>Address</th>
         </tr>
         {% for user in users %}
@@ -17,6 +18,7 @@
             <td>{{user.id}}</td>
             <td><a href="{% url 'admin' %}?pk={{user.id}}">{{user.username}}</a></td>
             <td>{{user.email}}</td>
+            <td>{{user.phone}}</td>
             <td><Address>{{user.address}}</Address></td>
         </tr>
         {% endfor %}

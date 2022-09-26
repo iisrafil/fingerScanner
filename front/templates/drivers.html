@@ -10,6 +10,7 @@
             <th>ID</th>
             <th>Name</th>
             <th>License No</th>
+            <th>Mobile</th>
             <th>Address</th>
             <th>Vehicles</th>
             <th>Fingerprints</th>
@@ -20,6 +21,7 @@
             <td>{{driver.id}}</td>
             <td><a href="{% url 'driver' %}?pk={{driver.id}}">{{driver.name}}</a></td>
             <td>{{driver.license_no}}</td>
+            <td>{{driver.phone}}</td>
             <td><Address>{{driver.address}}</Address></td>
             <td>
                 {% comment %} <a href="{% url 'dtov' %}?action=rm&amp;did={{driver.id}}">-</a>&nbsp; {% endcomment %}

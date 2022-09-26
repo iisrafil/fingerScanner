@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser;
 
 class Account(AbstractUser):
     address = models.TextField(max_length=200, default="No Address");
+    phone = models.CharField(max_length=20, default="01923240000");
     
     approved = models.BooleanField(default=False);
 
@@ -23,6 +24,7 @@ class Driver(models.Model):
 
     name = models.CharField(max_length=20);
     license_no = models.CharField(max_length=50, unique=True, null=False);
+    phone = models.CharField(max_length=20, default="01923240000");
     address = models.TextField(max_length=200, default="No Address");
     approved = models.BooleanField(default=False);
 
