@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser;
 # Create your models here.
 
 class Account(AbstractUser):
-    address = models.TextField(max_length=200, default="No Address");
+    address = models.TextField(max_length=200, default="5B/13, Razia Sultana Road, Mohammadpur, Dhaka-1207, Bangladesh.");
     phone = models.CharField(max_length=20, default="01923240000");
     
     approved = models.BooleanField(default=False);
