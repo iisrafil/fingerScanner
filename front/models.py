@@ -25,7 +25,7 @@ class Driver(models.Model):
     name = models.CharField(max_length=20);
     license_no = models.CharField(max_length=50, unique=True, null=False);
     phone = models.CharField(max_length=20, default="01923240000");
-    address = models.TextField(max_length=200, default="No Address");
+    address = models.TextField(max_length=200, default="5B/13, Razia Sultana Road, Mohammadpur, Dhaka-1207, Bangladesh.");
     approved = models.BooleanField(default=False);
 
     def __str__(self) -> str:
