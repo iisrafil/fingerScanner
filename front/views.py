@@ -1,7 +1,10 @@
 import os
+from random import randint
+from cv2 import split
 from django.shortcuts import render, redirect;
 from django.core.files.storage import FileSystemStorage;
 from django.core.files.images import ImageFile;
+from django.core.files.uploadedfile import UploadedFile;
 from django.conf import settings;
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm;
@@ -29,8 +32,34 @@ def call(*args, **kwargs):
     # perfplot.show(setup=np.random.rand, kernels=[np.sum,sum], n_range=[2**k for k in range(10)]);
     return;
 
-def init_load():
-    #
+def get_attrs(file):
+    split_dunder = file.split("__");
+    id = int(split_dunder[0]);
+
+    split_under = split_dunder[1].split("_");
+    finger = split_under[1][0].lower() + split_under[2][0];
+
+    return (id, finger);
+
+def init_load(req):
+    messages.add_message(req, messages.INFO, "add driver fp");
+
+    img_dir = "D:\\Baba\\fingerScanner\\SOCOFing\\Real\\".replace("\\", "/");
+    pics = sorted(os.listdir(img_dir), key=lambda x: get_attrs(x)[0]);
+    id_set = {get_attrs(x)[0] for x in pics};
+    # print({x+1 for x in range(600)}-id_set);
+    
+    for i in id_set:
+        Driver.objects.create(name=f"Driver-{i:03}", license_no=f"MHK{i:03}"+str(randint(100000000, 999999999)));
+        pass;
+
+    for file in pics:
+        id, fin = get_attrs(file);
+        try:
+            d = Driver.objects.get(name=f"Driver-{id:03}");
+            img = UploadedFile(file=open(img_dir+file, "rb"));
+            Fingerprint.objects.create(of=d, finger=fin, img=img);
+        except Exception as e: print(e);
     return {
         #
     };
@@ -41,7 +70,7 @@ def front(req: HttpRequest):
     context = {
         "nav": nav,
         "img": get_chart(call),
-        **init_load(),
+        # **init_load(req),
     };
     return render(req, "home.html", context);
 
@@ -208,15 +237,27 @@ def vehicle(req: HttpRequest):
 @login_required
 @allowed_users({"law", "owner"})
 def drivers(req: HttpRequest):
+    pg_size = 15;
+    page = req.GET.get("page");
+    page = int(page) if page else 1;
+
     vid = req.GET.get("vid");
     if vid: drivers = Driver.objects.filter(vehicles__id=vid);
     elif "owner" in str(req.user.groups.all()):
         drivers = Driver.objects.filter(vehicles__owner__id=req.user.id);
     else: drivers = Driver.objects.all();
 
+    n = drivers.count();
+    mx = (n-1) // pg_size + 1;
+    page = max(1, min(page, mx));
+    start = (page-1) * pg_size;
+    stop = start + pg_size;
+
     context = {
         "nav": nav,
-        "drivers": drivers,
+        "drivers": drivers[start:stop],
+        "page": page,
+        "mx": mx,
     };
     return render(req, "drivers.html", context);
 

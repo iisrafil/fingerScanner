@@ -4,7 +4,20 @@
 
 {% block content %}
     <h1>Driver</h1>
+    {% if request.user.is_superuser %}
+        <a href="{% url 'approve' %}?type=driver">Approve All</a>
+    {% endif %}
+    
+    {% if request.user.groups.all.0.name != 'law' %}
+        <a href="{% url 'driver' %}">Add</a>
+    {% endif %}
     {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
+    {% comment %} <p>Showing {{start}}-{{stop}} of {{n}}</p> {% endcomment %}
+    <p>
+        (<a href="{% url 'drivers' %}?page={{page|add:"-1"}}">prev</a>)
+        Page {{page}} of {{mx}}
+        (<a href="{% url 'drivers' %}?page={{page|add:1}}">next</a>)
+    </p>
     <table>
         <tr>
             <th>ID</th>
@@ -41,11 +54,4 @@
         </tr>
         {% endfor %}
     </table>
-    {% if request.user.is_superuser %}
-        <a href="{% url 'approve' %}?type=driver">Approve All</a>
-    {% endif %}
-    
-    {% if request.user.groups.all.0.name != 'law' %}
-        <a href="{% url 'driver' %}">Add</a>
-    {% endif %}
 {% endblock content %}
