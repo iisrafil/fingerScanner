@@ -7,7 +7,7 @@
     <form action="" method="post">
         {% csrf_token %}
         {{form.as_p}}
-        <button type="submit">Update</button>
+        <button type="submit">{% if pk %}Update{% else %}Add{% endif %}</button>
     </form>
     {% if request.user.is_superuser %}
         <a href="{% url 'delete' %}?type=driver&amp;pk={{pk}}">Delete</a>

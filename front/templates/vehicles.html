@@ -21,13 +21,13 @@
             <td><a href="{% url 'owner' %}?pk={{bus.owner.id}}">{{bus.owner.username}}</a></td>
             <td>{{bus.last_location}}</td>
             <td>
-                {% if request.user.groups.all.0.name != 'law' %}
-                    <a href="{% url 'vtod' %}?action=rm&amp;vid={{bus.id}}">-</a>&nbsp;
-                {% endif %}
+                {% if request.user.groups.all.0.name != 'law' %}{% if bus.approved %}
+                    <a href="{% url 'rm_vtod' %}?vid={{bus.id}}">-</a>&nbsp;
+                {% endif %}{% endif %}
                 <a href="{% url 'drivers' %}?vid={{bus.id}}">{{bus.driver_set.count}}</a>&nbsp;
-                {% if request.user.groups.all.0.name != 'law' %}
-                    <a href="{% url 'vtod' %}?action=add&amp;vid={{bus.id}}">+</a>
-                {% endif %}
+                {% if request.user.groups.all.0.name != 'law' %}{% if bus.approved %}
+                    <a href="{% url 'add_vtod' %}?vid={{bus.id}}">+</a>
+                {% endif %}{% endif %}
             </td>
             <td>{% if bus.approved %}
                 Approved

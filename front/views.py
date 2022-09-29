@@ -29,10 +29,19 @@ def call(*args, **kwargs):
     # perfplot.show(setup=np.random.rand, kernels=[np.sum,sum], n_range=[2**k for k in range(10)]);
     return;
 
+def init_load():
+    #
+    return {
+        #
+    };
+
 def front(req: HttpRequest):
+    if "pending" in str(req.user.groups.all()):
+        messages.info(req, "Approval pending");
     context = {
         "nav": nav,
         "img": get_chart(call),
+        **init_load(),
     };
     return render(req, "home.html", context);
 
@@ -64,7 +73,8 @@ def owner(req: HttpRequest):
         return redirect("home");
     form = ProfileUpdateForm(initial=Account.objects.get(pk=pk).__dict__);
     if req.method == "POST":
-        form = ProfileUpdateForm(data=req.POST);
+        ac = Account.objects.get(pk=pk);
+        form = ProfileUpdateForm(data=req.POST, instance=ac);
         if form.is_valid():
             form.save();
             messages.success(req, "Profile Updated");
@@ -97,7 +107,8 @@ def admin(req: HttpRequest):
     form = ProfileUpdateForm(initial=Account.objects.get(pk=pk).__dict__);
     # print(form.data.keys())
     if req.method == "POST":
-        form = ProfileUpdateForm(data=req.POST);
+        ac = Account.objects.get(pk=pk);
+        form = ProfileUpdateForm(data=req.POST, instance=ac);
         if form.is_valid():
             form.save();
             messages.success(req, "Profile Updated");
@@ -128,7 +139,8 @@ def law(req: HttpRequest):
         return redirect("home");
     form = ProfileUpdateForm(initial=Account.objects.get(pk=pk).__dict__);
     if req.method == "POST":
-        form = ProfileUpdateForm(data=req.POST);
+        ac = Account.objects.get(pk=pk);
+        form = ProfileUpdateForm(data=req.POST, instance=ac);
         if form.is_valid():
             form.save();
             messages.success(req, "Profile Updated");
@@ -198,8 +210,8 @@ def vehicle(req: HttpRequest):
 def drivers(req: HttpRequest):
     vid = req.GET.get("vid");
     if vid: drivers = Driver.objects.filter(vehicles__id=vid);
-    # elif "owner" in str(req.user.groups.all()):
-    #     drivers = Driver.objects.filter(vehicles__owner__id=req.user.id);
+    elif "owner" in str(req.user.groups.all()):
+        drivers = Driver.objects.filter(vehicles__owner__id=req.user.id);
     else: drivers = Driver.objects.all();
 
     context = {
@@ -211,21 +223,64 @@ def drivers(req: HttpRequest):
 @login_required
 @allowed_users({"owner"})
 def add_vtod(req: HttpRequest):
+    vid = req.GET.get("vid");
+    form = AddDriverForm();
 
-    return redirect("vehicles");
+    if req.method == "POST":
+        form = AddDriverForm(req.POST);
+        ln = form.data["license_no"];
+        try:
+            d = Driver.objects.get(license_no=ln, approved=True);
+            v = Vehicle.objects.get(pk=vid);
+            d.vehicles.add(v);
+            d.save();
+        except Exception as e:
+            messages.error(req, "Driver not found");
+        return redirect("vehicles");
+
+    context = {
+        "nav": nav,
+        "form": form,
+        "vid": vid,
+    }
+    return render(req, "add_vtod.html", context);
+
+@login_required
+@allowed_users({"owner"})
+def rm_vtod(req: HttpRequest):
+    vid = req.GET.get("vid");
+    drivers = Driver.objects.filter(vehicles__id=vid, approved=True);
+
+    if req.method == "POST":
+        new_dl = [];
+        try: new_dl = req.POST.getlist("linked_drivers");
+        except Exception as e:print(e);
+        drvs = Driver.objects.filter(name__in=new_dl, approved=True);
+        cur_v = Vehicle.objects.get(pk=vid);
+        cur_v.driver_set.clear();
+        cur_v.driver_set.add(*drvs.values_list("id", flat=True));
+        cur_v.save();
+
+        return redirect("vehicles");
+
+    context = {
+        "nav": nav,
+        "vid": vid,
+        "drivers": drivers,
+    };
+    return render(req, "rm_vtod.html", context);
 
 @login_required
 @allowed_users({"owner"})
 def driver(req: HttpRequest):
-    pk = None;
+    pk = req.GET.get("pk");
     form = DriverForm();
-    try:
-        pk = int(req.GET.get("pk"));
+    if pk:
         if not (req.user.is_superuser or req.user.id in list(Account.objects.filter(vehicle__driver__id=pk).values_list("id", flat=True))):
             messages.info(req, "Not your profile");
             return redirect("home");
         form = DriverForm(initial=Driver.objects.get(pk=pk).__dict__);
-    except Exception as e: print(e);
+    # except Exception as e: print(e);
     if req.method == "POST":
         form = DriverForm(data=req.POST);
         if form.is_valid():
@@ -270,36 +325,6 @@ def prints(req: HttpRequest):
         "prints": prints,
     };
     return render(req, "prints.html", context);
-
-@login_required
-@allowed_users({"owner"})
-def vtod(req: HttpRequest):
-    action = req.GET.get("action");
-    vid = req.GET.get("vid");
-    if action == "rm":
-        drivers = Driver.objects.filter(vehicles__id=vid, approved=True);
-    else: 
-        drivers = Driver.objects.exclude(vehicles__id=vid).exclude(approved=False);
-
-    if req.method == "POST":
-        new_dl = [];
-        try: new_dl = req.POST.getlist("linked_drivers");
-        except Exception as e:print(e);
-        drvs = Driver.objects.filter(name__in=new_dl, approved=True);
-        cur_v = Vehicle.objects.get(pk=vid);
-        if action == "rm": cur_v.driver_set.clear();
-        cur_v.driver_set.add(*drvs.values_list("id", flat=True));
-        cur_v.save();
-
-        return redirect("vehicles");
-
-    context = {
-        "nav": nav,
-        "vid": vid,
-        "drivers": drivers,
-        "action": action,
-    };
-    return render(req, "vtod.html", context);
 
 @login_required
 @allowed_users({"owner"})

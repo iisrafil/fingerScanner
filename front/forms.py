@@ -12,13 +12,13 @@ class CreateUserForm(UserCreationForm):
     ));
     class Meta(UserCreationForm.Meta):
         model = Account;
-        fields = UserCreationForm.Meta.fields + ("email", "address");
+        fields = UserCreationForm.Meta.fields + ("email", "address", "phone");
         # fields = "__all__";
 
 class ProfileUpdateForm(ModelForm):
     class Meta:
         model = Account;
-        fields = ("username", "email", "address");
+        fields = ("username", "email", "address", "phone");
 
 class VehicleForm(ModelForm):
     class Meta:
@@ -39,3 +39,6 @@ class DriverForm(ModelForm):
     #     self.pk = kwargs.pop("pk")
     #     super(DriverForm, self).__init__(*args, **kwargs)
     #     self.fields['vehicles'].queryset = Vehicle.objects.filter(driver_det__id=self.pk);
+
+class AddDriverForm(forms.Form):
+    license_no = forms.CharField(max_length=50);

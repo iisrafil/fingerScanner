@@ -8,7 +8,7 @@
     <form action="" method="post">
         {% csrf_token %}
         {% for driver in drivers %}
-            <input type="checkbox" name="linked_drivers" {% if action == 'rm' %}checked{% endif %} value="{{driver}}">{{driver}}</input>
+            <input type="checkbox" name="linked_drivers" checked value="{{driver}}">{{driver}}:{{driver.license_no}}</input>
         {% endfor %}
         <button type="submit">Done</button>
     </form>
