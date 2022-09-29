@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}admins{% endblock title %}
+
+{% block content %}
+    <h1>Own</h1>
+    {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Address</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{user.id}}</td>
+            <td><a href="{% url 'admin' %}?pk={{user.id}}">{{user.username}}</a></td>
+            <td>{{user.email}}</td>
+            <td>{{user.phone}}</td>
+            <td><Address>{{user.address}}</Address></td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}

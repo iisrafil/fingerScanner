@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}vehicles{% endblock title %}
+
+{% block content %}
+    <h1>Vehicles</h1>
+    {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>License</th>
+            <th>Owner</th>
+            <th>Last Location</th>
+            <th>Drivers</th>
+            <th>Approval Status</th>
+        </tr>
+        {% for bus in vehicles %}
+        <tr>
+            <td><a href="{% url 'vehicle' %}?oid={{user.id}}&amp;vid={{bus.id}}">{{bus.id}}</a></td>
+            <td>{{bus.license_no}}</td>
+            <td><a href="{% url 'owner' %}?pk={{bus.owner.id}}">{{bus.owner.username}}</a></td>
+            <td>{{bus.last_location}}</td>
+            <td>
+                {% if request.user.groups.all.0.name != 'law' %}{% if bus.approved %}
+                    <a href="{% url 'rm_vtod' %}?vid={{bus.id}}">-</a>&nbsp;
+                {% endif %}{% endif %}
+                <a href="{% url 'drivers' %}?vid={{bus.id}}">{{bus.driver_set.count}}</a>&nbsp;
+                {% if request.user.groups.all.0.name != 'law' %}{% if bus.approved %}
+                    <a href="{% url 'add_vtod' %}?vid={{bus.id}}">+</a>
+                {% endif %}{% endif %}
+            </td>
+            <td>{% if bus.approved %}
+                Approved
+            {% else %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'approve' %}?type=vehicle&amp;pk={{bus.id}}">Approve</a>
+                {% else %}
+                    Pending
+                {% endif %}
+            {% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% if request.user.is_superuser %}
+        <a href="{% url 'approve' %}?type=vehicle">Approve All</a>
+    {% endif %}
+{% endblock content %}

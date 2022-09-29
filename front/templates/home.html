@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %}welcome{% endblock title %}
+
+{% block content %}
+    <h1>Vehicle Authentication System using Fingerprint and Image</h1>
+    <h2>Hello, {% if user.is_authenticated %}{{user}}{% else %}Guest{% endif %}</h2>
+    <p>User groups: {{user.groups.all}}</p>
+    <img src="data:img/png;base64, {{img|safe}}" alt="perfplot">
+{% endblock content %}

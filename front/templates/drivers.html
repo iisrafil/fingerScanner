@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}drivers{% endblock title %}
+
+{% block content %}
+    <h1>Driver</h1>
+    {% if request.user.is_superuser %}
+        <a href="{% url 'approve' %}?type=driver">Approve All</a>
+    {% endif %}
+    
+    {% if request.user.groups.all.0.name != 'law' %}
+        <a href="{% url 'driver' %}">Add</a>
+    {% endif %}
+    {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
+    {% comment %} <p>Showing {{start}}-{{stop}} of {{n}}</p> {% endcomment %}
+    <p>
+        (<a href="{% url 'drivers' %}?page={{page|add:"-1"}}">prev</a>)
+        Page {{page}} of {{mx}}
+        (<a href="{% url 'drivers' %}?page={{page|add:1}}">next</a>)
+    </p>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>License No</th>
+            <th>Mobile</th>
+            <th>Address</th>
+            <th>Vehicles</th>
+            <th>Fingerprints</th>
+            <th>Approval Status</th>
+        </tr>
+        {% for driver in drivers %}
+        <tr>
+            <td>{{driver.id}}</td>
+            <td><a href="{% url 'driver' %}?pk={{driver.id}}">{{driver.name}}</a></td>
+            <td>{{driver.license_no}}</td>
+            <td>{{driver.phone}}</td>
+            <td><Address>{{driver.address}}</Address></td>
+            <td>
+                {% comment %} <a href="{% url 'dtov' %}?action=rm&amp;did={{driver.id}}">-</a>&nbsp; {% endcomment %}
+                <a href="{% url 'vehicles' %}?did={{driver.id}}">{{driver.vehicles.count}}</a>&nbsp;
+                {% comment %} <a href="{% url 'dtov' %}?action=add&amp;did={{driver.id}}">+</a> {% endcomment %}
+            </td>
+            <td><a href="{% url 'prints' %}?did={{driver.id}}">view</a></td>
+            <td>{% if driver.approved %}
+                Approved
+            {% else %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'approve' %}?type=driver&amp;pk={{driver.id}}">Approve</a>
+                {% else %}
+                    Pending
+                {% endif %}
+            {% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}
