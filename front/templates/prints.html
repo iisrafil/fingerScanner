@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}prints{% endblock title %}
+
+{% block content %}
+    <h1>Prints: {{user.username}}</h1>
+    <table>
+        <tr>
+            <th>{{driver.name}}'s digits</th>
+            <th>fingerprints</th>
+        </tr>
+        {% for print in prints %}
+        <tr>
+            <td>{{print.finger}}</td>
+            <td>
+                {% if print.print_obj %}
+                    <img src="{{print.print_obj.img.url}}" alt="{{print.print_obj}}">
+                {% else %}
+                    <form action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" name="prints:{{print.finger}}">
+                        <button type="submit">Upload</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}vehicles{% endblock title %}
+
+{% block content %}
+    <h1>Unlink driver from vehicle {{vid}}</h1>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {% for driver in drivers %}
+            <input type="checkbox" name="linked_drivers" checked value="{{driver}}">{{driver}}:{{driver.license_no}}</input>
+        {% endfor %}
+        <button type="submit">Done</button>
+    </form>
+
+{% endblock content %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}driver{% endblock title %}
+
+{% block content %}
+    <h1>Driver: {{user.username}}</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit">{% if pk %}Update{% else %}Add{% endif %}</button>
+    </form>
+    {% if request.user.is_superuser %}
+        <a href="{% url 'delete' %}?type=driver&amp;pk={{pk}}">Delete</a>
+    {% endif %}
+{% endblock content %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}laws{% endblock title %}
+
+{% block content %}
+    <h1>Own</h1>
+    {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Address</th>
+            <th>Approval Status</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{user.id}}</td>
+            <td><a href="{% url 'law' %}?pk={{user.id}}">{{user.username}}</a></td>
+            <td>{{user.email}}</td>
+            <td>{{user.phone}}</td>
+            <td><Address>{{user.address}}</Address></td>
+            <td>{% if user.approved %}
+                Approved
+            {% else %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'approve' %}?type=law&amp;pk={{user.id}}">Approve</a>
+                {% else %}
+                    Pending
+                {% endif %}
+            {% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}
