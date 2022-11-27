@@ -132,6 +132,7 @@ dmypy.json
 # Database
 SOCOFing/
 share/
+migrations/
 
 # Python
 scripts/
