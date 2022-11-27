@@ -434,7 +434,7 @@ def login_view(req: HttpRequest):
                 if req.GET.get("next"):
                     return redirect(req.GET.get("next"));
                 else: return redirect("home");
-        else: messages.error(req, "From not valid");
+        else: messages.error(req, "Form not valid");
 
     context = {
         "nav": nav,
