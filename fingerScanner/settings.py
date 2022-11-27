@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-m**a1yr(!fq1h7zva&zs=r-317)al*80ydgxb=0u$1#w=xal&@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['python-webapp-54321.azurewebsites.net','smartcarbd.com','www.smartcarbd.com', 'www.python-webapp-54321.azurewebsites.net']
+ALLOWED_HOSTS = ['python-webapp-54321.azurewebsites.net','smartcarbd.com','www.smartcarbd.com', 'www.python-webapp-54321.azurewebsites.net', '127.0.0.1']
 
 
 # Application definition
