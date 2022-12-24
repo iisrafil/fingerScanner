@@ -48,6 +48,8 @@ def call(*args, **kwargs):
             matcher(i);
             ts.append(time()-cur);
         ts = [i/1e9 for i in ts];
+        plt.xlabel("No. of fingerprints");
+        plt.ylabel("Seconds");
         plt.plot(tst_vals, ts);
         plt.stem(tst_vals, ts);
     return;
