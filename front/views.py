@@ -44,7 +44,7 @@ def get_attrs(file):
 def init_load(req):
     messages.add_message(req, messages.INFO, "add driver fp");
 
-    img_dir = "D:\\Baba\\fingerScanner\\SOCOFing\\Real\\".replace("\\", "/");
+    img_dir = "D:\\Baba\\SOCOFing\\Real\\".replace("\\", "/");
     pics = sorted(os.listdir(img_dir), key=lambda x: get_attrs(x)[0]);
     id_set = {get_attrs(x)[0] for x in pics};
     # print({x+1 for x in range(600)}-id_set);
