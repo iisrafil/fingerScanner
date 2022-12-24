@@ -28,7 +28,7 @@ from time import time_ns as time;
 
 # Create your views here.
 
-nav = ["home", "about", "owners", "admins", "laws", "vehicles", "drivers"];
+nav = ["home", "simulation", "owners", "admins", "laws", "vehicles", "drivers"];
 
 def call(*args, **kwargs):
     # perfplot.show(setup=np.random.rand, kernels=[np.sum,sum], n_range=[2**k for k in range(10)]);
@@ -41,7 +41,7 @@ def call(*args, **kwargs):
         plt.imshow(matcher(s), origin="lower");
         print((time()-cur));
     else:
-        tst_vals = [*range(100, 5288, 864)];
+        tst_vals = [*range(1, 5288, 1000)];
         ts = [];
         for i in tst_vals:
             cur = time();
@@ -103,7 +103,7 @@ class ChoiceForm(forms.Form):
 
 @login_required
 @allowed_users(set())
-def about(req: HttpRequest):
+def simulation(req: HttpRequest):
     form = ChoiceForm(req.POST or None);
     if form.is_valid():
         ss_val = form.cleaned_data.get("choices");
