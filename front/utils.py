@@ -1,7 +1,7 @@
 from io import BytesIO
 import os
 import cv2
-from random import shuffle;
+from random import shuffle, choice;
 from base64 import b64encode;
 import matplotlib.pyplot as plt;
 import numpy as np;
@@ -10,20 +10,17 @@ import requests;
 
 from fingerScanner.settings import BASE_DIR
 
-directory = str(BASE_DIR) + "/SOCOFing/"
-# sus = "Altered/Altered-Hard/150__M_Right_index_finger_Obl.BMP"
-def matcher(suspect):
-    sample = cv2.imread(directory+suspect)
-
+def matcher(ss = 200):
     max_score = -1;
     file = None;
     img = None;
     kp1 = kp2 = mp = None;
-    search_space = sorted(os.listdir(directory+"Real"), key=lambda x: int(x.split("_")[0]))[:2000];
+    search_space = sorted(os.listdir("./static/media/prints"), key=lambda x: int(x.split("_")[0]))[:ss]; #max=5288
     # print(search_space[-5:]);
     shuffle(search_space);
+    sample = cv2.imread("./static/media/prints/" + choice(search_space))
     for f in search_space:
-        fimg = cv2.imread(directory+"Real/" + f);
+        fimg = cv2.imread("./static/media/prints/" + f);
 
         sift = cv2.SIFT_create();
 
@@ -63,7 +60,6 @@ def get_graph():
 def get_chart(call, *args, **kwargs):
     plt.switch_backend("AGG");
     # plt.imshow(data, origin="lower");
-    # p.show(setup=np.random.rand, kernels=[np.sum,sum], n_range=[2**k for k in range(10)]);
     call(args, kwargs);
     plt.tight_layout();
     chart = get_graph();

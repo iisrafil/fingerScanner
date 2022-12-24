@@ -16,13 +16,15 @@ from django.http import HttpRequest;
 # from django.http.request import QueryDict;
 # from django.contrib.auth.mixins import
 #  LoginRequiredMixin;
-from .utils import get_chart, getUsers;
+from .utils import get_chart, getUsers, matcher;
 from .forms import *;
 from .decorators import *;
 from .models import *;
 
 import numpy as np;
+import matplotlib.pyplot as plt;
 import perfplot;
+from time import time_ns as time;
 
 # Create your views here.
 
@@ -30,6 +32,24 @@ nav = ["home", "about", "owners", "admins", "laws", "vehicles", "drivers"];
 
 def call(*args, **kwargs):
     # perfplot.show(setup=np.random.rand, kernels=[np.sum,sum], n_range=[2**k for k in range(10)]);
+    # sus = "./static/media/sus/1__M_Left_index_finger_CR.BMP";
+    s = 100;
+    try: s = int(args[0][0]);
+    except: pass;
+    if 0<s and s<=5288:
+        cur = time();
+        plt.imshow(matcher(s), origin="lower");
+        print((time()-cur));
+    else:
+        tst_vals = [*range(100, 5288, 864)];
+        ts = [];
+        for i in tst_vals:
+            cur = time();
+            matcher(i);
+            ts.append(time()-cur);
+        ts = [i/1e9 for i in ts];
+        plt.plot(tst_vals, ts);
+        plt.stem(tst_vals, ts);
     return;
 
 def get_attrs(file):
@@ -69,14 +89,33 @@ def front(req: HttpRequest):
         messages.info(req, "Approval pending");
     context = {
         "nav": nav,
-        "img": get_chart(call),
         # **init_load(req),
     };
     return render(req, "home.html", context);
 
+chs = [
+    ("cmp", "compare"),
+    ("200", "200"),
+    ("500", "500"),
+];
+class ChoiceForm(forms.Form):
+    choices = forms.IntegerField(min_value=0, max_value=5288, label="Enter the size of search space (enter 0 to compare): ");
+
+@login_required
+@allowed_users(set())
 def about(req: HttpRequest):
+    form = ChoiceForm(req.POST or None);
+    if form.is_valid():
+        ss_val = form.cleaned_data.get("choices");
+        return render(req, "about.html", {
+            "nav": nav,
+            "img": get_chart(call, ss_val),
+            "form": form
+        });
     context = {
         "nav": nav,
+        "img": get_chart(call),
+        "form": form
     };
     return render(req, "about.html", context);
 
