@@ -38,7 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     "front.apps.FrontConfig",
+    'api.apps.ApiConfig',
+    'scanner.apps.ScannerConfig',
     "debug_toolbar",
+
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
