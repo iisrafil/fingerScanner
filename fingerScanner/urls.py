@@ -18,11 +18,15 @@ from django.urls import path, include
 from django.conf.urls.static import static;
 from django.conf import settings;
 from django.shortcuts import redirect;
+from api.views import UploadViewSet#, catch_esp32;
 
 
 urlpatterns = [
     path('', lambda req: redirect("home")),
     path('admin/', admin.site.urls),
     path('front/', include("front.urls"), name="front"),
+    path('api-im/', UploadViewSet.as_view({'post': 'create'}), name="back"),
+    # path('api-im/', catch_esp32, name="back"),
+    path('api-auth/', include('rest_framework.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
