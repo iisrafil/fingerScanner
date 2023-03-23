@@ -4,6 +4,7 @@ from . import views;
 urlpatterns = [
     path("", views.front, name="home"),
     path("simulation/", views.simulation, name="simulation"),
+    path("cam/", views.rcv_pic, name="cam"),
     path("owners/", views.owners, name="owners"),
     path("owner/", views.owner, name="owner"),
     path("admins/", views.admins, name="admins"),

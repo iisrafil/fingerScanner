@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}ESP32-CAM AI Thinker{% endblock title %}
+
+{% block content %}
+    <h1>Intruders</h1>
+    {% comment %} <code>{{users.0.values}}</code> {% endcomment %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Device</th>
+            <th>Time</th>
+            <th>Finger</th>
+            <th>Image</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{user.id}}</td>
+            <td>{{user.device.id}}</td>
+            <td>{{user.time}}</td>
+            <td>{{user.finger}}</td>
+            <td><img src="{{user.image.url}}" alt="{{user.image}}"></td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}

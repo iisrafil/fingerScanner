@@ -17,7 +17,7 @@ class Finger(models.Model):
 class Intruder(models.Model):
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True, blank=True)
-    finger = models.ForeignKey(Finger, on_delete=models.CASCADE)
+    finger = models.ForeignKey(Finger, on_delete=models.CASCADE, null=True)
     image = models.ImageField(upload_to='Intruders')
 
 

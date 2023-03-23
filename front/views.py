@@ -20,6 +20,7 @@ from .utils import get_chart, getUsers, matcher;
 from .forms import *;
 from .decorators import *;
 from .models import *;
+from api.models import Intruder;
 
 import numpy as np;
 import matplotlib.pyplot as plt;
@@ -28,7 +29,8 @@ from time import time_ns as time;
 
 # Create your views here.
 
-nav = ["home", "simulation", "owners", "admins", "laws", "vehicles", "drivers"];
+nav = ["home", "simulation", "cam", "owners", "admins", "laws", "vehicles", "drivers"];
+
 
 def call(*args, **kwargs):
     # perfplot.show(setup=np.random.rand, kernels=[np.sum,sum], n_range=[2**k for k in range(10)]);
@@ -118,6 +120,17 @@ def simulation(req: HttpRequest):
         "form": form
     };
     return render(req, "about.html", context);
+
+@login_required
+@allowed_users(set())
+def rcv_pic(req: HttpRequest):
+    users = Intruder.objects.all();
+
+    context = {
+        "nav": nav,
+        "users": users,
+    };
+    return render(req, "cam.html", context);
 
 @login_required(login_url="login")
 @allowed_users({"law", "owner"})
